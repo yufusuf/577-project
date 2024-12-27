@@ -11,7 +11,8 @@ for i in sizes:
     file_name = matrix_folder + str(i) + 'x' + str(i)
     print(f"generating {file_name}")
     matrix = np.random.rand(i+1, i)*100
-    print(matrix)
-    # np.savetxt(file_name, matrix, delimiter=',')
     matrix.tofile(file_name)
-    break
+    b = matrix[i]
+    matrix = matrix[:i]
+    print(np.linalg.solve(matrix, b))
+    # np.savetxt(file_name, matrix, delimiter=',')

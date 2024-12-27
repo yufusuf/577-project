@@ -74,25 +74,27 @@ int main() {
 		}
 		printf("\n");
 
-		// double result[matrix_size];
-		// int info = linear_system_solver(A, n, b, result);
+		double result[matrix_size];
+		int info = linear_system_solver(matrix, matrix_size, b, result);
 
-		// if (info > 0) {
-		// 	printf("The matrix is singular; the solution could not
-		// be " 	       "computed.\n"); 	return EXIT_FAILURE;
-		// }
-		//
-		// // Print the solution
-		// printf("Solution:\n");
-		// for (int i = 0; i < n; i++) {
-		// 	printf("x[%d] = %f\n", i, result[i]);
-		// }
+		if (info > 0) {
+			printf(
+			    "The matrix is singular; the solution could notbe "
+			    "computed.\n");
+			return EXIT_FAILURE;
+		}
+
+		// Print the solution
+		printf("Solution:\n");
+		for (int i = 0; i < matrix_size; i++) {
+			printf("x[%d] = %f\n", i, result[i]);
+		}
 
 		free(matrix_path);
 		fclose(matrix_f);
 		free(p);
 		free(matrix);
-		break;
+		// break;
 	}
 	closedir(dir);
 	return 0;
