@@ -38,6 +38,8 @@ $(TEST_TARGET): $(TEST_OBJS)
 # Clean up build files
 clean:
 	rm -f $(MAIN_OBJS) $(TEST_OBJS) $(MAIN_TARGET) $(TEST_TARGET)
+run_test:
+	./test
 
 # PHONY targets
 .PHONY: all clean
