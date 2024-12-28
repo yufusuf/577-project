@@ -94,7 +94,6 @@ int main() {
 		fclose(matrix_f);
 		free(p);
 		free(matrix);
-		// break;
 	}
 	closedir(dir);
 	return 0;
