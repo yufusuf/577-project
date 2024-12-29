@@ -58,6 +58,9 @@ int cyclic_reduction_seq(double A[], int dim_A, double b[], double *result) {
 	return 0;
 }
 
-int cyclic_reduction_paralel(double A[], int dim_A, double *b, double *result) {
+int cyclic_reduction_parallel(double A[], int dim_A, double *b,
+			      double *result) {
 
+	memset(result, 0, sizeof(double) * dim_A);
+	return 0;
 }

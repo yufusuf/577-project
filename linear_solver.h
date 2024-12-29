@@ -12,4 +12,6 @@
  *
  */
 int linear_system_solver(double A[], int dim_A, double b[], double *result);
+int tridiag_system_solver(double dl[], double d[], double du[], double b[],
+			  int size, double *result);
 #endif // !__LINEAR_SOLVER

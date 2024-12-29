@@ -9,3 +9,10 @@ int linear_system_solver(double A[], int dim_A, double b[], double *result) {
 			     result, 1);
 	return info;
 }
+int tridiag_system_solver(double dl[], double d[], double du[], double b[],
+			  int size, double *result) {
+	int info;
+	memcpy(result, b, size * sizeof(double));
+	info = LAPACKE_dgtsv(LAPACK_ROW_MAJOR, size, 1, dl, d, du, result, 1);
+	return info;
+}
