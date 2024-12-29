@@ -1,4 +1,5 @@
 #include "linear_solver.h"
+#include <string.h>
 
 int linear_system_solver(double A[], int dim_A, double b[], double *result) {
 	int info;

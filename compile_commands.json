@@ -1,0 +1,17 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "-I/usr/include/x86_64-linux-gnu/mpich",
+      "-o",
+      "main.o",
+      "main.c"
+    ],
+    "directory": "/home/yusuf/Desktop/cesitli/577",
+    "file": "/home/yusuf/Desktop/cesitli/577/main.c",
+    "output": "/home/yusuf/Desktop/cesitli/577/main.o"
+  }
+]
