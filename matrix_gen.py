@@ -13,12 +13,12 @@ for i in range(3, 15):
     # matrix = np.random.rand(i+1, i)*100
     # b = matrix[i]
     # matrix = matrix[:i]
-    main_diag = np.random.uniform(0, 100, matrix_size)
-    upper_diag = np.random.uniform(0, 100, matrix_size - 1)
-    lower_diag = np.random.uniform(0, 100, matrix_size - 1)
+    main_diag = np.random.uniform(0, 1, matrix_size)
+    upper_diag = np.random.uniform(0, 1, matrix_size - 1)
+    lower_diag = np.random.uniform(0, 1, matrix_size - 1)
     matrix = np.diag(main_diag) + np.diag(upper_diag, k=1) + \
         np.diag(lower_diag, k=-1)
-    b = np.random.uniform(0, 100, matrix_size)
+    b = np.random.uniform(0, 1, matrix_size)
     # print(matrix)
     # print(b)
     try:
