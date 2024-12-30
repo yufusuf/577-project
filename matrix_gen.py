@@ -19,8 +19,8 @@ for i in range(3, 15):
     matrix = np.diag(main_diag) + np.diag(upper_diag, k=1) + \
         np.diag(lower_diag, k=-1)
     b = np.random.uniform(0, 100, matrix_size)
-    print(matrix)
-    print(b)
+    # print(matrix)
+    # print(b)
     try:
         res = np.linalg.solve(matrix, b)
     except np.LinAlgError:

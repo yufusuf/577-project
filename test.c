@@ -5,11 +5,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define EPSILON 0.00001
+#define EPSILON 0.000001
 #define abs(x) ((x) < 0 ? -(x) : (x))
 
 const char *TEST_PASSED = "\033[32m\tTEST PASSED\033[0m";
 const char *TEST_FAILED = "\033[31m\tTEST FAILED\033[0m";
+double calculate_l2_norm(double *vector, int size);
+void print_matrix_1(double *A, int size);
+int check_result(double *true_solution, double *solution, int dim, int verbose);
+double calculate_residual_error(double *matrix, double *solution, double *b, int matrix_size);
+double calculate_l2_norm(double *vector, int size);
+void extract_diagonals(double *A, int size, double *dl, double *d, double *du);
+double get_time();
 
 void print_matrix_1(double *A, int size) {
 	for (int i = 0; i < size; i++) {
@@ -19,6 +26,7 @@ void print_matrix_1(double *A, int size) {
 		printf("\n");
 	}
 }
+// dont use, calculate correctness with residual_error
 int check_result(double *true_solution, double *solution, int dim, int verbose) {
 	int correct = 1;
 	for (int i = 0; i < dim; i++) {
@@ -32,6 +40,30 @@ int check_result(double *true_solution, double *solution, int dim, int verbose) 
 		}
 	}
 	return correct;
+}
+double calculate_residual_error(double *matrix, double *solution, double *b, int matrix_size) {
+	double *Ax = (double *)malloc(matrix_size * sizeof(double));
+	double residual = 0.0;
+
+	// Calculate Ax
+	for (int i = 0; i < matrix_size; i++) {
+		Ax[i] = 0.0;
+		for (int j = 0; j < matrix_size; j++) {
+			Ax[i] += matrix[i * matrix_size + j] * solution[j];
+		}
+		// Residual vector
+		residual += (Ax[i] - b[i]) * (Ax[i] - b[i]);
+	}
+
+	free(Ax);
+	return sqrt(residual);
+}
+double calculate_l2_norm(double *vector, int size) {
+	double norm = 0.0;
+	for (int i = 0; i < size; i++) {
+		norm += vector[i] * vector[i];
+	}
+	return sqrt(norm);
 }
 
 void extract_diagonals(double *A, int size, double *dl, double *d, double *du) {
@@ -60,8 +92,8 @@ int main() {
 	double *matrix;
 	double *b;
 	double *temp_A;
-	int test_result;
 	double time;
+	double err;
 
 	dir = opendir(path);
 	if (!dir) {
@@ -93,21 +125,21 @@ int main() {
 
 		fread(matrix, sizeof(double), matrix_size * matrix_size, matrix_f);
 		fread(b, sizeof(double), matrix_size, matrix_f);
-		double true_result[matrix_size];
-		double cyclic_result[matrix_size];
+		double result[matrix_size];
 
 		temp_A = malloc(sizeof(double) * matrix_size * matrix_size);
 
 		// copy matrixes as LAPACKE modifies original input
-		memset(cyclic_result, 0, sizeof(double) * matrix_size);
+		memset(result, 0, sizeof(double) * matrix_size);
 		memcpy(temp_A, matrix, matrix_size * matrix_size * sizeof(double));
 
 		// linear solver (DGESV) ==============
 		time = get_time();
-		int info = linear_system_solver(temp_A, matrix_size, b, true_result);
+		int info = linear_system_solver(temp_A, matrix_size, b, result);
 		time = get_time() - time;
+		err = calculate_residual_error(matrix, result, b, matrix_size);
 
-		printf("DGESV (linear solver): \tTIME: \t %f ms\n", time * 1000);
+		printf("DGESV (linear solver): \tTIME: \t %.2f ms \t residual_err: %f\n", time * 1000, err);
 
 		if (info > 0) {
 			printf("linear_system_solver: The matrix is singular; "
@@ -126,39 +158,43 @@ int main() {
 		extract_diagonals(matrix, matrix_size, dl, d, du);
 
 		time = get_time();
-		info = tridiag_system_solver(dl, d, du, b, matrix_size, cyclic_result);
+		info = tridiag_system_solver(dl, d, du, b, matrix_size, result);
 		time = get_time() - time;
+		err = calculate_residual_error(matrix, result, b, matrix_size);
 
-		printf("DGTSV (tridia solver): \tTIME: \t %f ms\n", 1000 * time);
+		// printf("%s\n", check_result(true_result, cyclic_result, matrix_size, 0) ? TEST_PASSED : TEST_FAILED);
+		// for (int i = 0; i < matrix_size; i++) {
+		// 	printf("%f ", cyclic_result[i]);
+		// }
+		// printf("\n");
+		printf("DGTSV (tridia solver): \tTIME: \t %.2f ms \t residual err: %f\n", 1000 * time, err);
 		// ================
 
 		// sequential crc ==============
 		memcpy(temp_A, matrix, matrix_size * matrix_size * sizeof(double));
 
 		time = get_time();
-		info = cyclic_reduction_seq(temp_A, matrix_size, b, cyclic_result);
+		info = cyclic_reduction_seq(temp_A, matrix_size, b, result);
 		time = get_time() - time;
+		err = calculate_residual_error(matrix, result, b, matrix_size);
 
 		if (info > 0) {
 			printf(" cyclic_reduction: could not compute");
 		}
 
-		test_result = check_result(true_result, cyclic_result, matrix_size, 0);
-
-		printf("SEQ: %s, \tTIME: \t %f ms\n", test_result ? TEST_PASSED : TEST_FAILED, time * 1000);
+		printf("SEQ: %s, \tTIME: \t %.2f ms \t residual err: %f\n", err < EPSILON ? TEST_PASSED : TEST_FAILED, time * 1000, err);
 		// ==============
 
 		// parallel ==============
-		memset(cyclic_result, 0, sizeof(double) * matrix_size);
+		memset(result, 0, sizeof(double) * matrix_size);
 		memcpy(temp_A, matrix, matrix_size * matrix_size * sizeof(double));
 
 		time = get_time();
-		info = cyclic_reduction_parallel(temp_A, matrix_size, b, cyclic_result);
+		info = cyclic_reduction_parallel(temp_A, matrix_size, b, result);
 		time = get_time() - time;
+		err = calculate_residual_error(matrix, result, b, matrix_size);
 
-		test_result = check_result(true_result, cyclic_result, matrix_size, 0);
-
-		printf("PARA: %s, \tTIME: \t %f ms\n", test_result ? TEST_PASSED : TEST_FAILED, 1000 * time);
+		printf("PARA: %s, \tTIME: \t %.2f ms \t residual err: %f \n", err < EPSILON ? TEST_PASSED : TEST_FAILED, 1000 * time, err);
 		//==============
 		printf("\n");
 
