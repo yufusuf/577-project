@@ -1,18 +1,28 @@
 #include "cyclic.h"
+#include "tridiagonal_matrix.h"
 #include <cblas.h>
 #include <math.h>
 #include <mpi.h>
 #include <stdlib.h>
 #include <string.h>
 
-int cyclic_reduction_seq(double A[], int dim_A, double b[], double *result) {
-	int i, j, k, stride;
-	int index1, index2, offset;
+int cyclic_reduction_seq(struct tridiagonal_matrix *m, double b[], double *result) {
+	int i, j, k, stride, index1, index2, offset;
 	double alpha, gamma;
-	int size = dim_A;
-	int levels = (int)ceil(log2(size + 1));
+	int size = m->size;
+	int levels = (size_t)ceil(log2(size + 1));
 	double *F = malloc(sizeof(double) * size);
 	memcpy(F, b, sizeof(double) * size);
+	double *A = calloc(size * size, sizeof(double));
+	for (int i = 0; i < size; i++) {
+		A[i * size + i] = m->d[i];
+		if (i > 0) {
+			A[i * size + (i - 1)] = m->dl[i - 1];
+		}
+		if (i < size - 1) {
+			A[i * size + (i + 1)] = m->du[i];
+		}
+	}
 
 	for (i = 0; i < levels - 1; i++) {
 		stride = 1 << (i + 1);
@@ -48,6 +58,7 @@ int cyclic_reduction_seq(double A[], int dim_A, double b[], double *result) {
 			result[index2] = result[index2] / A[index_of(index2, size, index2)];
 		}
 	}
+	free(A);
 	free(F);
 
 	return 0;

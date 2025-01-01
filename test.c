@@ -141,36 +141,32 @@ int main() {
 		result = malloc(sizeof(double) * matrix_size);
 
 		// linear solver (DGESV) ==============
-		time = get_time();
-		linear_system_solver(A, b, result);
-		time = get_time() - time;
-		err = calculate_residual_error(A, result, b, matrix_size);
-
-		printf("DGESV (linear solver): \tTIME: \t %.2f ms \t residual_err: %e\n", time * 1000, err);
-
-		// ==============
-
-		// tridiag solver DGTSV ==============
-		time = get_time();
-		tridiag_system_solver(A, b, result);
-		time = get_time() - time;
-		err = calculate_residual_error(A, result, b, matrix_size);
-
-		printf("DGTSV (tridia solver): \tTIME: \t %.2f ms \t residual err: %e\n", 1000 * time, err);
-		// ================
-
-		// // sequential crc ==============
 		// time = get_time();
-		// info = cyclic_reduction_seq(A, matrix_size, b, result);
+		// linear_system_solver(A, b, result);
 		// time = get_time() - time;
 		// err = calculate_residual_error(A, result, b, matrix_size);
 		//
-		// if (info > 0) {
-		// 	printf(" cyclic_reduction: could not compute");
-		// }
+		// printf("DGESV (linear solver): \tTIME: \t %.2f ms \t residual_err: %e\n", time * 1000, err);
 		//
-		// printf("SEQ: %s, \tTIME: \t %.2f ms \t residual err: %e\n", err < EPSILON ? TEST_PASSED : TEST_FAILED, time * 1000, err);
 		// // ==============
+		//
+		// // tridiag solver DGTSV ==============
+		// time = get_time();
+		// tridiag_system_solver(A, b, result);
+		// time = get_time() - time;
+		// err = calculate_residual_error(A, result, b, matrix_size);
+		//
+		// printf("DGTSV (tridia solver): \tTIME: \t %.2f ms \t residual err: %e\n", 1000 * time, err);
+		// ================
+
+		// sequential crc ==============
+		time = get_time();
+		cyclic_reduction_seq(A, b, result);
+		time = get_time() - time;
+		err = calculate_residual_error(A, result, b, matrix_size);
+
+		printf("SEQ: %s, \tTIME: \t %.2f ms \t residual err: %e\n", err < EPSILON ? TEST_PASSED : TEST_FAILED, time * 1000, err);
+		// ==============
 
 		// parallel ==============
 		// memset(result, 0, sizeof(double) * matrix_size);
