@@ -8,9 +8,9 @@ struct tridiagonal_matrix *init_tmatrix(size_t size) {
 	return new;
 }
 int alloc_tmatrix(struct tridiagonal_matrix *m) {
-	m->du = malloc(sizeof(double) * (m->size - 1));
-	m->d = malloc(sizeof(double) * (m->size));
-	m->dl = malloc(sizeof(double) * (m->size - 1));
+	m->du = calloc((m->size), sizeof(double));
+	m->d = calloc((m->size), sizeof(double));
+	m->dl = calloc((m->size), sizeof(double));
 	return 0;
 }
 
@@ -18,7 +18,7 @@ double get_tmatrix_elem(struct tridiagonal_matrix *m, size_t i, size_t j) {
 	if (i == j) {
 		return m->d[i];
 	} else if (i == j + 1) {
-		return m->dl[j];
+		return m->dl[i - 1];
 	} else if (j == i + 1) {
 		return m->du[i];
 	} else {
@@ -32,8 +32,8 @@ void copy_tmatrix(struct tridiagonal_matrix **dest, struct tridiagonal_matrix *s
 	(*dest)->size = size;
 	alloc_tmatrix(*dest);
 	memcpy((*dest)->d, src->d, sizeof(double) * size);
-	memcpy((*dest)->du, src->du, sizeof(double) * (size - 1));
-	memcpy((*dest)->dl, src->dl, sizeof(double) * (size - 1));
+	memcpy((*dest)->du, src->du, sizeof(double) * (size));
+	memcpy((*dest)->dl, src->dl, sizeof(double) * (size));
 }
 
 void free_tmatrix(struct tridiagonal_matrix *m) {

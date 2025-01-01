@@ -52,20 +52,22 @@ int check_result(double *true_solution, double *solution, int dim, int verbose) 
 	return correct;
 }
 double calculate_residual_error(struct tridiagonal_matrix *matrix, double *solution, double *b, int matrix_size) {
-	double *Ax = (double *)malloc(matrix_size * sizeof(double));
+	double Ax = 0.0;
 	double residual = 0.0;
 
 	// Calculate Ax
 	for (int i = 0; i < matrix_size; i++) {
-		Ax[i] = 0.0;
-		for (int j = 0; j < matrix_size; j++) {
-			Ax[i] += get_tmatrix_elem(matrix, i, j) * solution[j];
+		Ax = 0.0;
+		if (i > 0) {
+			Ax += matrix->dl[i] * solution[i - 1];
 		}
-		// Residual vector
-		residual += (Ax[i] - b[i]) * (Ax[i] - b[i]);
+		Ax += matrix->d[i] * solution[i];
+		if (i < matrix_size - 1) {
+			Ax += matrix->du[i] * solution[i + 1];
+		}
+		residual += (Ax - b[i]) * (Ax - b[i]);
 	}
 
-	free(Ax);
 	return sqrt(residual);
 }
 double calculate_l2_norm(double *vector, int size) {
@@ -134,8 +136,8 @@ int main() {
 		b = malloc(matrix_size * sizeof(double)); // rhs
 
 		fread(A->d, sizeof(double), matrix_size, matrix_f);
-		fread(A->du, sizeof(double), matrix_size - 1, matrix_f);
-		fread(A->dl, sizeof(double), matrix_size - 1, matrix_f);
+		fread(A->du, sizeof(double), matrix_size, matrix_f);
+		fread(A->dl, sizeof(double), matrix_size, matrix_f);
 		fread(b, sizeof(double), matrix_size, matrix_f);
 
 		result = malloc(sizeof(double) * matrix_size);
