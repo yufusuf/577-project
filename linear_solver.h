@@ -1,17 +1,8 @@
-#ifndef __LINEAR_SOLVER
-#include <lapacke.h>
-#include <string.h>
+#ifndef __LINEAR_SOLVER_H
+#define __LINEAR_SOLVER_H
 
-/**
- * Solves linear system Ax=b
- * @param double* A input matrix
- * @param int dim_A number of equations, first dimension of A
- * @param double* b rhs matrix, has leading dimension of 1
- * @param double* result stores the resulting vector in result
- * @return int info info related to execution
- *
- */
-int linear_system_solver(double A[], int dim_A, double b[], double *result);
-int tridiag_system_solver(double dl[], double d[], double du[], double b[],
-			  int size, double *result);
+#include "tridiagonal_matrix.h"
+
+int linear_system_solver(struct tridiagonal_matrix *m, double b[], double *result);
+int tridiag_system_solver(struct tridiagonal_matrix *m, double b[], double *result);
 #endif // !__LINEAR_SOLVER
