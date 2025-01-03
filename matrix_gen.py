@@ -30,7 +30,7 @@ for i in range(3, num_matrices):
     matrix_size = 2**i - 1
     file_name = matrix_folder + str(matrix_size) + 'x' + str(matrix_size)
     print(f"generating {file_name}")
-    main_diag, upper_diag, lower_diag, b = sikko_gen(matrix_size)
+    main_diag, upper_diag, lower_diag, b = random_gen(matrix_size)
     # matrix = np.diag(main_diag) + np.diag(upper_diag[:matrix_size - 1], k=1) + np.diag(lower_diag[1:], k=-1)
     # print(np.linalg.solve(matrix, b))
 

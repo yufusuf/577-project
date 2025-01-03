@@ -4,14 +4,16 @@
       "/usr/bin/gcc",
       "-Wall",
       "-Wextra",
+      "-g",
       "-c",
-      "-I/usr/include/x86_64-linux-gnu/mpich",
+      "-I/usr/lib/x86_64-linux-gnu/openmpi/include",
+      "-I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi",
       "-o",
-      "main.o",
-      "main.c"
+      "cyclic.o",
+      "cyclic.c"
     ],
     "directory": "/home/yusuf/Desktop/cesitli/577",
-    "file": "/home/yusuf/Desktop/cesitli/577/main.c",
-    "output": "/home/yusuf/Desktop/cesitli/577/main.o"
+    "file": "/home/yusuf/Desktop/cesitli/577/cyclic.c",
+    "output": "/home/yusuf/Desktop/cesitli/577/cyclic.o"
   }
 ]

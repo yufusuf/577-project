@@ -1,4 +1,6 @@
 #include "linear_solver.h"
+#include "aux.h"
+#include "tridiagonal_matrix.h"
 #include <lapacke.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,17 +11,8 @@ int linear_system_solver(struct tridiagonal_matrix *m, double b[], double *resul
 	size_t size = m->size;
 	int pivots[size];
 	memcpy(result, b, size * sizeof(double));
-	// form nxn matrix;
 	double *A = calloc(size * size, sizeof(double));
-	for (size_t i = 0; i < size; i++) {
-		A[i * size + i] = m->d[i];
-		if (i > 0) {
-			A[i * size + (i - 1)] = m->dl[i - 1];
-		}
-		if (i < size - 1) {
-			A[i * size + (i + 1)] = m->du[i];
-		}
-	}
+	convert_to_nxn(m, A);
 	info = LAPACKE_dgesv(LAPACK_ROW_MAJOR, size, 1, A, size, pivots, result, 1);
 	free(A);
 	return info;
@@ -32,6 +25,7 @@ int tridiag_system_solver(struct tridiagonal_matrix *m, double b[], double *resu
 	copy_tmatrix(&temp, m);
 
 	info = LAPACKE_dgtsv(LAPACK_ROW_MAJOR, temp->size, 1, temp->dl + 1, temp->d, temp->du, result, 1);
+	// print_vect(result, m->size);
 
 	free_tmatrix(temp);
 	return info;

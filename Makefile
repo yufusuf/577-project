@@ -6,10 +6,10 @@ CFLAGS = -Wall -Wextra -g
 LIBS = -llapacke -lblas -lm
 
 # Source files
-TEST_SRCS = test.c linear_solver.c cyclic.c tridiagonal_matrix.c
+TEST_SRCS = test.c linear_solver.c cyclic_serial.c tridiagonal_matrix.c aux.c
 
 # Header files
-HEADERS = linear_solver.h 
+HEADERS = linear_solver.h aux.h tridiagonal_matrix.h cyclic_serial.h
 
 # Object files
 TEST_OBJS = $(TEST_SRCS:.c=.o)

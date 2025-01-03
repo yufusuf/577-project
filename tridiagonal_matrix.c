@@ -1,4 +1,5 @@
 #include "tridiagonal_matrix.h"
+#include "aux.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,9 +9,9 @@ struct tridiagonal_matrix *init_tmatrix(size_t size) {
 	return new;
 }
 int alloc_tmatrix(struct tridiagonal_matrix *m) {
-	m->du = calloc((m->size), sizeof(double));
+	m->du = calloc((m->size), sizeof(double)); // padded with a zero entry at end
 	m->d = calloc((m->size), sizeof(double));
-	m->dl = calloc((m->size), sizeof(double));
+	m->dl = calloc((m->size), sizeof(double)); // padded with a zero entry at first index
 	return 0;
 }
 
@@ -34,6 +35,15 @@ void copy_tmatrix(struct tridiagonal_matrix **dest, struct tridiagonal_matrix *s
 	memcpy((*dest)->d, src->d, sizeof(double) * size);
 	memcpy((*dest)->du, src->du, sizeof(double) * (size));
 	memcpy((*dest)->dl, src->dl, sizeof(double) * (size));
+}
+void convert_to_nxn(struct tridiagonal_matrix *m, double *A) {
+	for (size_t i = 0; i < m->size; i++) {
+		if (i > 0)
+			A[index_of(i, m->size, i - 1)] = m->dl[i];
+		if (i < m->size - 1)
+			A[index_of(i, m->size, i + 1)] = m->du[i];
+		A[index_of(i, m->size, i)] = m->d[i];
+	}
 }
 
 void free_tmatrix(struct tridiagonal_matrix *m) {
