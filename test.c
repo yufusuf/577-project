@@ -8,7 +8,7 @@
 #include <string.h>
 #include <time.h>
 
-#define EPSILON 0.000001
+#define EPSILON 1e-10
 #define abs(x) ((x) < 0 ? -(x) : (x))
 
 const char *TEST_PASSED = "\033[32m\tTEST PASSED\033[0m";
@@ -68,7 +68,7 @@ double calculate_residual_error(struct tridiagonal_matrix *matrix, double *solut
 		residual += (Ax - b[i]) * (Ax - b[i]);
 	}
 
-	return sqrt(residual);
+	return sqrt(residual) / calculate_l2_norm(b, matrix_size);
 }
 double calculate_l2_norm(double *vector, int size) {
 	double norm = 0.0;
@@ -152,13 +152,13 @@ int main() {
 		//
 		// // ==============
 		//
-		// // tridiag solver DGTSV ==============
-		// time = get_time();
-		// tridiag_system_solver(A, b, result);
-		// time = get_time() - time;
-		// err = calculate_residual_error(A, result, b, matrix_size);
-		//
-		// printf("DGTSV (tridia solver): \tTIME: \t %.2f ms \t residual err: %e\n", 1000 * time, err);
+		// tridiag solver DGTSV ==============
+		time = get_time();
+		tridiag_system_solver(A, b, result);
+		time = get_time() - time;
+		err = calculate_residual_error(A, result, b, matrix_size);
+
+		printf("DGTSV (tridia solver): \tTIME: \t %.2f ms \t residual err: %e\n", 1000 * time, err);
 		// ================
 
 		// sequential crc ==============

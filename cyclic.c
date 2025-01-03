@@ -14,6 +14,7 @@ int cyclic_reduction_seq(struct tridiagonal_matrix *m, double b[], double *resul
 	int levels = (size_t)ceil(log2(size + 1));
 	double *F = malloc(sizeof(double) * size);
 	memcpy(F, b, sizeof(double) * size);
+	memset(result, 0, sizeof(double) * size);
 	struct tridiagonal_matrix *A;
 	copy_tmatrix(&A, m);
 	for (i = 0; i < levels - 1; i++) {

@@ -1,5 +1,6 @@
 #include "linear_solver.h"
 #include <lapacke.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -30,7 +31,7 @@ int tridiag_system_solver(struct tridiagonal_matrix *m, double b[], double *resu
 	memcpy(result, b, m->size * sizeof(double));
 	copy_tmatrix(&temp, m);
 
-	info = LAPACKE_dgtsv(LAPACK_ROW_MAJOR, temp->size, 1, temp->dl, temp->d, temp->du, result, 1);
+	info = LAPACKE_dgtsv(LAPACK_ROW_MAJOR, temp->size, 1, temp->dl + 1, temp->d, temp->du, result, 1);
 
 	free_tmatrix(temp);
 	return info;
