@@ -20,7 +20,9 @@ def sikko_gen(size):
     lower_diag = np.full(size, -1).astype(np.float64)
     lower_diag[0] = 0
     upper_diag[size - 1] = 0
-    b = np.full(size, 1).astype(np.float64)
+    b = np.random.uniform(0, 1, size).astype(np.float64)
+    # b = np.full(1, size).astype(np.float64)
+
     return main_diag, upper_diag, lower_diag, b
 
 
@@ -30,7 +32,7 @@ for i in range(3, num_matrices):
     matrix_size = 2**i - 1
     file_name = matrix_folder + str(matrix_size) + 'x' + str(matrix_size)
     print(f"generating {file_name}")
-    main_diag, upper_diag, lower_diag, b = random_gen(matrix_size)
+    main_diag, upper_diag, lower_diag, b = sikko_gen(matrix_size)
     # matrix = np.diag(main_diag) + np.diag(upper_diag[:matrix_size - 1], k=1) + np.diag(lower_diag[1:], k=-1)
     # print(np.linalg.solve(matrix, b))
 

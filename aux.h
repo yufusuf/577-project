@@ -6,7 +6,7 @@
 #define index_of(...) index_(__VA_ARGS__)
 #define index_(i, size, j) ((i) * (size) + (j))
 #define abs(x) ((x) < 0 ? -(x) : (x))
-#define EPSILON 1e-8
+#define EPSILON 1e-5
 
 void print_matrix(double *A, int size);
 void print_vect(double *b, int size);

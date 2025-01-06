@@ -70,12 +70,12 @@ int main() {
 		// ================
 
 		// sequential crc low mem==============
-		// time = get_time();
-		// cyclic_reduction_seq_low_mem(A, b, result);
-		// time = get_time() - time;
-		// err = calculate_residual_error(A, result, b, matrix_size);
-		//
-		// printf("SEQ_l: %s, \tTIME: \t %.2f ms \t residual err: %e\n", err < EPSILON ? TEST_PASSED : TEST_FAILED, time * 1000, err);
+		time = get_time();
+		cyclic_reduction_seq_low_mem(A, b, result);
+		time = get_time() - time;
+		err = calculate_residual_error(A, result, b, matrix_size);
+
+		printf("SEQ_l: %s, \tTIME: \t %.2f ms \t residual err: %e\n", err < EPSILON ? TEST_PASSED : TEST_FAILED, time * 1000, err);
 		// ==============
 
 		if (matrix_size < (1 << 14)) {

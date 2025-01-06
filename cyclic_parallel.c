@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
 	double alpha, gamma;
 	const int numrows = 5;
 	MPI_Status status;
+	printf("hello\n");
 	MPI_Init(&argc, &argv);
 
 	MPI_Comm_size(MPI_COMM_WORLD, &totalnodes);
