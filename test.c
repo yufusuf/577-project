@@ -7,24 +7,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char *TEST_PASSED = "\033[32m\tTEST PASSED\033[0m";
-const char *TEST_FAILED = "\033[31m\tTEST FAILED\033[0m";
-
 int main() {
-	const char *path = "./matrixes/";
+	const char *matrix_dir_path = "./matrixes/";
 	struct dirent *entry;
 	struct tridiagonal_matrix *A = NULL;
 	double *b;
+	struct tridiagonal_matrix *p_matrix;
+	double *p_result;
+	double *p_b;
 	int matrix_size;
 	DIR *dir;
 	FILE *matrix_f;
-	char *matrix_path;
+	char *matrix_path = NULL;
 	char *p;
 	double time;
 	double err;
 	double *result;
 
-	dir = opendir(path);
+	dir = opendir(matrix_dir_path);
 	if (!dir) {
 		perror("unable to open matrixes");
 		return 1;
@@ -35,8 +35,8 @@ int main() {
 		// read test file name
 		p = strdup(entry->d_name);
 		matrix_size = atoi(strtok(p, "x"));
-		matrix_path = malloc(sizeof(char) * (strlen(path) + strlen(entry->d_name) + 1));
-		strncpy(matrix_path, path, strlen(path));
+		matrix_path = calloc((strlen(matrix_dir_path) + strlen(entry->d_name) + 1), sizeof(char));
+		strncpy(matrix_path, matrix_dir_path, strlen(matrix_dir_path));
 		strcat(matrix_path, entry->d_name);
 
 		printf("RUNNING TEST ON: %s \n", matrix_path);
@@ -61,21 +61,15 @@ int main() {
 
 		//
 		// tridiag solver DGTSV ==============
-		time = get_time();
-		tridiag_system_solver(A, b, result);
-		time = get_time() - time;
+		time = tridiag_system_solver(A, b, result);
 		err = calculate_residual_error(A, result, b, matrix_size);
-
-		printf("DGTSV (tridia solver): \tTIME: \t %.2f ms \t residual err: %e\n", 1000 * time, err);
+		printf("DGTSV (tridia solver)	      :\t\t\t TIME: %.6f ms \t residual err: %-10e\n", 1000 * time, err);
 		// ================
 
 		// sequential crc low mem==============
-		time = get_time();
-		cyclic_reduction_seq_low_mem(A, b, result);
-		time = get_time() - time;
+		time = cyclic_reduction_seq_low_mem(A, b, result);
 		err = calculate_residual_error(A, result, b, matrix_size);
-
-		printf("SEQ_l: %s, \tTIME: \t %.2f ms \t residual err: %e\n", err < EPSILON ? TEST_PASSED : TEST_FAILED, time * 1000, err);
+		printf("SEQ_l: (serial cyclic solver):\t\t\t TIME: " RED_TEXT("%.6f ms") "\t residual err: %-10e\n", time * 1000, err);
 		// ==============
 
 		if (matrix_size < (1 << 14)) {
@@ -98,23 +92,31 @@ int main() {
 			// ==============
 		}
 
-		// parallel ============== do execv here
-		// time = get_time();
-		// cyclic_reduction_parallel(A, b, result);
-		// time = get_time() - time;
-		// err = calculate_residual_error(A, result, b, matrix_size);
-		//
-		// printf("PARA: %s, \tTIME: \t %.2f ms \t residual err: %e \n", err < EPSILON ? TEST_PASSED : TEST_FAILED, 1000 * time, err);
+		// parallel ============== we read results from parallel_solutions folder
+		// read parallel results into p_matrix and p_result arrays
+		p_matrix = init_tmatrix(matrix_size + 1);
+		alloc_tmatrix(p_matrix);
+		p_b = malloc((matrix_size + 1) * sizeof(double)); // rhs
+		p_result = malloc((matrix_size + 1) * sizeof(double));
+		if (read_parallel_results(p_matrix, p_b, p_result, matrix_size + 1, &time) == 0) {
+			err = calculate_residual_error(p_matrix, p_result, p_b, matrix_size + 1);
+			printf("PARA: (parallel cyclic solver):\t\t\t TIME: " GREEN_TEXT("%.6f ms") "\t residual err: %10e \n", 1000 * time, err);
+		} else {
+			printf("PARA: no solution for %d\n", matrix_size + 1);
+		}
 		//==============
 		printf("\n");
 
 		free(matrix_path);
 		free(p);
 		free(result);
+		free(p_result);
 		free(b);
+		free(p_b);
 
 		fclose(matrix_f);
 		free_tmatrix(A);
+		free_tmatrix(p_matrix);
 	}
 	closedir(dir);
 	return 0;

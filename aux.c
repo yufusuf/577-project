@@ -74,3 +74,26 @@ double get_time() {
 	clock_gettime(CLOCK_REALTIME, &now);
 	return now.tv_sec + now.tv_nsec * 1e-9;
 }
+int read_parallel_results(struct tridiagonal_matrix *A, double *b, double *res, int matrix_size, double *time) {
+	char path[32] = {0};
+	FILE *f;
+	snprintf(path, sizeof(path), "./parallel_solutions/%d", (matrix_size));
+
+	f = fopen(path, "rb");
+	if (!f) {
+		printf("error opening solution file %s\n", path);
+		return 1;
+	}
+	for (int i = 0; i < matrix_size; i++) {
+		A->du[i] = -1.0;
+		A->d[i] = 2.0;
+		A->dl[i] = -1.0;
+	}
+	A->dl[0] = 0.0;
+	A->du[matrix_size - 1] = 0.0;
+	fread(res, sizeof(double), matrix_size, f);
+	fread(b, sizeof(double), matrix_size, f);
+	fread(time, sizeof(double), 1, f);
+	fclose(f);
+	return 0;
+}

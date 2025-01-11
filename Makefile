@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = mpicc
-CFLAGS = -Wall -Wextra -g
+CFLAGS = -Wall -Wextra -g -pedantic
 
 # Libraries
 LIBS = -llapacke -lblas -lm

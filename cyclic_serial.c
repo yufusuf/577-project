@@ -7,10 +7,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-int cyclic_reduction_seq_low_mem(struct tridiagonal_matrix *m, double b[], double *result) {
+double cyclic_reduction_seq_low_mem(struct tridiagonal_matrix *m, double b[], double *result) {
 	// this does not work if sub diagonal has entries -1, main diag 2, and super diagonal has -1.
 	int i, j, stride, index1, index2, offset;
 	double alpha, gamma;
+	double time;
 	int size = m->size;
 	int levels = (size_t)ceil(log2(size + 1));
 	double *F = malloc(sizeof(double) * size);
@@ -18,6 +19,7 @@ int cyclic_reduction_seq_low_mem(struct tridiagonal_matrix *m, double b[], doubl
 	memset(result, 0, sizeof(double) * size);
 	struct tridiagonal_matrix *A;
 	copy_tmatrix(&A, m);
+	time = get_time();
 	for (i = 0; i < levels - 1; i++) {
 		stride = 1 << (i + 1);
 		for (j = stride - 1; j < size; j += stride) {
@@ -72,23 +74,27 @@ int cyclic_reduction_seq_low_mem(struct tridiagonal_matrix *m, double b[], doubl
 			// result[index2] = result[index2] / A[index_of(index2, size, index2)];
 		}
 	}
+	time = get_time() - time;
 	free_tmatrix(A);
 	free(F);
 
-	return 0;
+	return time;
 }
 
-int cyclic_reduction_seq_high_mem(struct tridiagonal_matrix *m, double b[], double *result) {
+double cyclic_reduction_seq_high_mem(struct tridiagonal_matrix *m, double b[], double *result) {
 	int i, j, k, stride, index1, index2, offset;
 	double alpha, gamma;
+	double time;
 	int size = m->size;
 	int levels = (size_t)ceil(log2(size + 1));
+
 	double *F = malloc(sizeof(double) * size);
 	memcpy(F, b, sizeof(double) * size);
 	memset(result, 0, sizeof(double) * size);
 	double *A = calloc(size * size, sizeof(double));
 
 	convert_to_nxn(m, A);
+	time = get_time();
 	for (i = 0; i < levels - 1; i++) {
 		stride = 1 << (i + 1);
 		for (j = stride - 1; j < size; j += stride) {
@@ -125,8 +131,9 @@ int cyclic_reduction_seq_high_mem(struct tridiagonal_matrix *m, double b[], doub
 			result[index2] = result[index2] / A[index_of(index2, size, index2)];
 		}
 	}
+	time = get_time() - time;
 	free(A);
 	free(F);
 
-	return 0;
+	return time;
 }
