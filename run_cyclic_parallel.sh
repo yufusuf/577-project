@@ -1,9 +1,9 @@
 #!/bin/bash
 
-for arg in {4..24}; do
+for arg in {7..24}; do
     shifted=$((1<<arg)) 
     echo "Running cyclic_parallel with $shifted..."
-    mpirun -np 4 cyclic_parallel $shifted
+    sbatch -o slurm_outs/$shifted.out slurm_test.sh $shifted
     echo ""
 done
 
