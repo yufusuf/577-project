@@ -2,3 +2,9 @@ matrixes
 *.o
 .cache
 results
+bok_pusur
+parallel_solutions
+test
+cyclic_parallel
+analytics.bin
+
