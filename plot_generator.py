@@ -18,13 +18,13 @@ with open(file_path, "r") as f:
 results.sort(key=lambda x: x[8])
 
 # Separate the results into individual lists
-dgtsv_time = [r[0] for r in results]
+dgtsv_time = [r[0] * 1000 for r in results]
 dgtsv_err = [r[1] for r in results]  # Read error but don't use it yet
-dgesv_time = [r[2] for r in results]
+dgesv_time = [r[2] * 1000 for r in results]
 dgesv_err = [r[3] for r in results]  # Read error but don't use it yet
-cyclic_seq_time = [r[4] for r in results]
+cyclic_seq_time = [r[4] * 1000 for r in results]
 cyclic_seq_err = [r[5] for r in results]  # Read error but don't use it yet
-cyclic_par_time = [r[6] for r in results]
+cyclic_par_time = [r[6] * 1000 for r in results]
 cyclic_par_err = [r[7] for r in results]  # Read error but don't use it yet
 sizes = [r[8] for r in results]
 
