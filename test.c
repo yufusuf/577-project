@@ -7,6 +7,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct run_result {
+	double dgtsv_time;
+	double dgtsv_err;
+	double dgesv_time;
+	double dgesv_err;
+	double cyclic_seq_time;
+	double cyclic_seq_err;
+	double cyclic_par_time;
+	double cyclic_par_err;
+	double size;
+};
+void write_run_result(struct run_result run_result, FILE *handle) {
+	fprintf(handle, "%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g\n", run_result.dgtsv_time, run_result.dgtsv_err, run_result.dgesv_time, run_result.dgesv_err, run_result.cyclic_seq_time,
+		run_result.cyclic_seq_err, run_result.cyclic_par_time, run_result.cyclic_par_err, run_result.size);
+}
 int main() {
 	const char *matrix_dir_path = "./matrixes/";
 	struct dirent *entry;
@@ -23,6 +38,8 @@ int main() {
 	double time;
 	double err;
 	double *result;
+	struct run_result run_result;
+	FILE *analytics_file = fopen("analytics.txt", "w");
 
 	dir = opendir(matrix_dir_path);
 	if (!dir) {
@@ -48,6 +65,7 @@ int main() {
 			printf("filepath: %s\n", matrix_path);
 			return 1;
 		}
+		run_result.size = matrix_size;
 		A = init_tmatrix(matrix_size);
 		alloc_tmatrix(A);
 		b = malloc(matrix_size * sizeof(double)); // rhs
@@ -64,23 +82,19 @@ int main() {
 		time = tridiag_system_solver(A, b, result);
 		err = calculate_residual_error(A, result, b, matrix_size);
 		printf("DGTSV (tridia solver)	      :\t\t\t TIME: %.6f ms \t residual err: %-10e\n", 1000 * time, err);
+		run_result.dgtsv_time = time;
+		run_result.dgtsv_err = err;
 		// ================
 
-		// sequential crc low mem==============
-		time = cyclic_reduction_seq_low_mem(A, b, result);
-		err = calculate_residual_error(A, result, b, matrix_size);
-		printf("SEQ_l: (serial cyclic solver):\t\t\t TIME: " RED_TEXT("%.6f ms") "\t residual err: %-10e\n", time * 1000, err);
-		// ==============
+		if (matrix_size < (1 << 13)) {
+			// linear solver (DGESV) ==============
+			time = linear_system_solver(A, b, result);
+			err = calculate_residual_error(A, result, b, matrix_size);
 
-		if (matrix_size < (1 << 14)) {
-			// // linear solver (DGESV) ==============
-			// time = get_time();
-			// linear_system_solver(A, b, result);
-			// time = get_time() - time;
-			// err = calculate_residual_error(A, result, b, matrix_size);
-			//
-			// printf("DGESV (linear solver): \tTIME: \t %.2f ms \t residual_err: %e\n", time * 1000, err);
-			// // ==============
+			printf("DGESV (linear solver)         :\t\t\t TIME: %.6f ms \t residual_err: %-10e\n", time * 1000, err);
+			run_result.dgesv_time = time;
+			run_result.dgesv_err = err;
+			// ==============
 			//
 			// // sequential crc high mem==============
 			// time = get_time();
@@ -90,9 +104,19 @@ int main() {
 			//
 			// printf("SEQ_h: %s, \tTIME: \t %.2f ms \t residual err: %e\n", err < EPSILON ? TEST_PASSED : TEST_FAILED, time * 1000, err);
 			// ==============
+		} else {
+			run_result.dgesv_time = 0.0;
+			run_result.dgesv_err = 0.0;
 		}
+		// sequential crc low mem==============
+		time = cyclic_reduction_seq_low_mem(A, b, result);
+		err = calculate_residual_error(A, result, b, matrix_size);
+		printf("SEQ_l: (serial cyclic solver):\t\t\t TIME: " RED_TEXT("%.6f ms") "\t residual err: %-10e\n", time * 1000, err);
+		run_result.cyclic_seq_time = time;
+		run_result.cyclic_par_err = err;
+		// ==============
 
-		// parallel ============== we read results from parallel_solutions folder
+		// parallel ============== read results from parallel_solutions folder
 		// read parallel results into p_matrix and p_result arrays
 		p_matrix = init_tmatrix(matrix_size + 1);
 		alloc_tmatrix(p_matrix);
@@ -100,12 +124,18 @@ int main() {
 		p_result = malloc((matrix_size + 1) * sizeof(double));
 		if (read_parallel_results(p_matrix, p_b, p_result, matrix_size + 1, &time) == 0) {
 			err = calculate_residual_error(p_matrix, p_result, p_b, matrix_size + 1);
-			printf("PARA: (parallel cyclic solver):\t\t\t TIME: " GREEN_TEXT("%.6f ms") "\t residual err: %10e \n", 1000 * time, err);
+			printf("PARA: (parallel cyclic solver):\t\t\t TIME: " GREEN_TEXT("%.6f ms") "\t residual err: %-10e \n", 1000 * time, err);
 		} else {
+			err = 0.0;
+			time = 0.0;
 			printf("PARA: no solution for %d\n", matrix_size + 1);
 		}
+		run_result.cyclic_par_time = time;
+		run_result.cyclic_par_err = err;
 		//==============
 		printf("\n");
+		// write analytics to file
+		write_run_result(run_result, analytics_file);
 
 		free(matrix_path);
 		free(p);

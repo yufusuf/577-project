@@ -28,7 +28,7 @@ def sikko_gen(size):
 
 # num_matrices = int(input("Enter N:"))
 matrix_folder = './matrixes/'
-for i in range(4, 25):
+for i in range(7, 25):
     matrix_size = 2**i - 1
     file_name = matrix_folder + str(matrix_size) + 'x' + str(matrix_size)
     print(f"generating {file_name}")
