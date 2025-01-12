@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 	int size_per_process;
 	int matrix_size;
 	double *dl, *d, *du, *x, *b;
-	double *r_temp;
+	double *b_temp;
 	double start_time, elapsed_time;
 	MPI_Init(&argc, &argv);
 
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 	du = malloc(sizeof(double) * (size_per_process + 2)); // sub diag
 
 	b = malloc(sizeof(double) * (size_per_process + 2));	  // rhs
-	r_temp = malloc(sizeof(double) * (size_per_process + 2)); // rhs
+	b_temp = malloc(sizeof(double) * (size_per_process + 2)); // rhs
 
 	x = malloc(sizeof(double) * (size_per_process + 2)); // result array
 
@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 		d[i] = 2.0;
 		du[i] = -1.0;
 		b[i] = ((double)rand()) / RAND_MAX;
-		r_temp[i] = b[i];
+		b_temp[i] = b[i];
 	}
 	start_time = MPI_Wtime();
 	forward_multi(dl, d, du, b, size_per_process, nprocs, mynode);
@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
 		rhs = malloc(sizeof(double) * matrix_size);
 	}
 	MPI_Gather(x + 1, size_per_process, MPI_DOUBLE, solution, size_per_process, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-	MPI_Gather(r_temp + 1, size_per_process, MPI_DOUBLE, rhs, size_per_process, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	MPI_Gather(b_temp + 1, size_per_process, MPI_DOUBLE, rhs, size_per_process, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 	if (mynode == 0) {
 		write_results(solution, rhs, matrix_size, &elapsed_time);
 	}
@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
 	free(du);
 	free(x);
 	free(b);
-	free(r_temp);
+	free(b_temp);
 
 	MPI_Finalize();
 
