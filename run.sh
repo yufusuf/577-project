@@ -14,7 +14,7 @@ if [ "$FROM" -lt 7 ]; then
 	echo "starting size cannot be smaller than 7"
 	exit 1
 fi
-if [ "$TO" -gt 25 ]; then
+if [ "$TO" -gt 27 ]; then
 	echo "end size cannot be larger than 25"
 	exit 1
 fi
