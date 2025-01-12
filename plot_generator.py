@@ -25,6 +25,12 @@ cyclic_par_time = [r[6] for r in results]
 cyclic_par_err = [r[7] for r in results]
 sizes = [r[8] for r in results]
 
+with open("execution_times.txt", "w") as out_file:
+    # Write the header
+    out_file.write("Size,DGTSV Time,DGESV Time,Cyclic Sequential Time,Cyclic Parallel Time\n")
+    # Write the data
+    for size, dgtsv, dgesv, cyclic_seq, cyclic_par in zip(sizes, dgtsv_time, dgesv_time, cyclic_seq_time, cyclic_par_time):
+        out_file.write(f"{size},{dgtsv},{dgesv},{cyclic_seq},{cyclic_par}\n")
 # Plot the results
 plt.figure(figsize=(12, 6))
 
