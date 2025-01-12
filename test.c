@@ -23,7 +23,7 @@ void write_run_result(struct run_result run_result, FILE *handle) {
 		run_result.cyclic_seq_err, run_result.cyclic_par_time, run_result.cyclic_par_err, run_result.size);
 }
 int main() {
-	const char *matrix_dir_path = "./matrixes/";
+	const char *matrix_dir_path = "./matrices/";
 	struct dirent *entry;
 	struct tridiagonal_matrix *A = NULL;
 	double *b;
@@ -43,7 +43,7 @@ int main() {
 
 	dir = opendir(matrix_dir_path);
 	if (!dir) {
-		perror("unable to open matrixes");
+		perror("unable to open matrices");
 		return 1;
 	}
 	while ((entry = readdir(dir)) != NULL) {

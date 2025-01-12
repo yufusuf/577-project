@@ -25,7 +25,7 @@ cyclic_par_time = [r[6] for r in results]
 cyclic_par_err = [r[7] for r in results]
 sizes = [r[8] for r in results]
 
-with open("execution_times.txt", "w") as out_file:
+with open("./results/execution_times.txt", "w") as out_file:
     # Write the header
     out_file.write("Size,DGTSV Time,DGESV Time,Cyclic Sequential Time,Cyclic Parallel Time\n")
     # Write the data
@@ -56,6 +56,6 @@ plt.legend()
 # plt.ylabel("Error")
 # plt.title("Errors")
 # plt.legend()
-plt.savefig("execution_times.png", dpi=300, bbox_inches="tight")
+plt.savefig("./results/execution_times.png", dpi=300, bbox_inches="tight")
 plt.tight_layout()
 

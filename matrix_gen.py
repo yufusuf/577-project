@@ -1,5 +1,5 @@
 # import os
-# import sys
+import sys
 # import random
 import numpy as np
 
@@ -27,8 +27,14 @@ def sikko_gen(size):
 
 
 # num_matrices = int(input("Enter N:"))
-matrix_folder = './matrixes/'
-for i in range(7, 25):
+matrix_folder = './matrices/'
+if len(sys.argv) < 3:
+    print("err: two arguments are required")
+    print("Usage: python3 matrix_gen.py <from> <to>")
+    exit(1)
+fromm = int(sys.argv[1])
+to = int(sys.argv[2])
+for i in range(fromm, to):
     matrix_size = 2**i - 1
     file_name = matrix_folder + str(matrix_size) + 'x' + str(matrix_size)
     print(f"generating {file_name}")
