@@ -1,6 +1,9 @@
 import os
+import sys
 import matplotlib.pyplot as plt
 
+
+nproc = sys.argv[1]
 # File path to the text file
 file_path = "analytics.txt"
 
@@ -41,7 +44,7 @@ colors = {
 }
 
 # Save execution times to file
-with open("./results/execution_times.txt", "w") as out_file:
+with open(f"./results/execution_times{nproc}.txt", "w") as out_file:
     out_file.write("Size,DGTSV Time (ms),DGESV Time (ms),Cyclic Sequential Time (ms),Cyclic Parallel Time (ms)\n")
     for size, dgtsv, dgesv, cyclic_seq, cyclic_par in zip(sizes, dgtsv_time, dgesv_time, cyclic_seq_time, cyclic_par_time):
         out_file.write(f"{size},{dgtsv},{dgesv},{cyclic_seq},{cyclic_par}\n")
@@ -55,7 +58,7 @@ plt.xlabel("Matrix Size")
 plt.ylabel("Execution Time (ms)")
 plt.title("DGTSV vs Cyclic Times")
 plt.legend()
-plt.savefig("./results/dgtsv_cyclic_times.png", dpi=300, bbox_inches="tight")
+plt.savefig(f"./results/dgtsv_cyclic_times{nproc}.png", dpi=300, bbox_inches="tight")
 plt.close()
 
 # Plot execution times (all)
@@ -68,7 +71,7 @@ plt.xlabel("Matrix Size")
 plt.ylabel("Execution Time (ms)")
 plt.title("Execution Times")
 plt.legend()
-plt.savefig("./results/execution_times.png", dpi=300, bbox_inches="tight")
+plt.savefig(f"./results/execution_times{nproc}.png", dpi=300, bbox_inches="tight")
 plt.close()
 
 # Plot speedup
@@ -79,6 +82,6 @@ plt.xlabel("Matrix Size")
 plt.ylabel("Speedup (Sequential Time / Parallel Time)")
 plt.title("Parallel Speedup")
 plt.legend()
-plt.savefig("./results/speedup.png", dpi=300, bbox_inches="tight")
+plt.savefig(f"./results/speedup{nproc}.png", dpi=300, bbox_inches="tight")
 plt.close()
 

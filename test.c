@@ -88,12 +88,12 @@ int main() {
 
 		if (matrix_size < (1 << 13)) {
 			// linear solver (DGESV) ==============
-			time = linear_system_solver(A, b, result);
-			err = calculate_residual_error(A, result, b, matrix_size);
+			// time = linear_system_solver(A, b, result);
+			// err = calculate_residual_error(A, result, b, matrix_size);
 
-			printf("DGESV (linear solver)         :\t\t\t TIME: %.6f ms \t residual_err: %-10e\n", time * 1000, err);
-			run_result.dgesv_time = time;
-			run_result.dgesv_err = err;
+			// printf("DGESV (linear solver)         :\t\t\t TIME: %.6f ms \t residual_err: %-10e\n", time * 1000, err);
+			// run_result.dgesv_time = time;
+			// run_result.dgesv_err = err;
 			// ==============
 			//
 			// // sequential crc high mem==============
