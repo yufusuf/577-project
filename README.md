@@ -35,5 +35,18 @@ Use the `run.sh` script to execute the program with specific arguments.
    ./run.sh 7 25 32 --no-generate
    ```
 
+## Results
+You can find the results in the `results` directory. `greyfurt_results` includes results of runs with 16 and 32 million sized matrices with process count going from 2 to 64 in powers of 2.
+
+For running the program with different number of processes, you can use the following command:
+```bash
+for n in $(seq 1 6); do ./run.sh 7 25 $((2**n)) --no-generate; done
+
+```
+
+Then you can use the `ideal_speedup_plot.py` script to plot the ideal speedup graph in `greyfurt_results`. Copy it to the results then run it. Plot will be saved as `ideal_speedup_plot.png`.
+
+
+
 ---
 
