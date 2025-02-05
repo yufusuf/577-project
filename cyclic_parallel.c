@@ -1,3 +1,5 @@
+// implementation influnced by the following code
+// https://github.com/jihoonakang/parallel_tdma_cpp
 #include <math.h>
 #include <mpi.h>
 #include <stdio.h>
